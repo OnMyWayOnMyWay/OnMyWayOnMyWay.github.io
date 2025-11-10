@@ -2,181 +2,255 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Happy Birthday Lilly!</title>
+  <title>Lilly's Cosmic Birthday</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="starfield"></div>
-  <div class="container">
-    <button class="birthday-btn shine" id="birthdayBtn">Press Me</button>
-    <div class="heart-container" id="heartContainer">
-      <div class="particles"></div>
-      <svg class="heart" viewBox="0 0 200 200">
-        <path 
-          id="heartOutline"
-          d="M100 30
-            Q140 0 170 30
-            Q200 60 100 180
-            Q0 60 30 30
-            Q60 0 100 30Z"
-          stroke="url(#heartGradient)" stroke-width="7" fill="none"/>
-        <defs>
-          <linearGradient id="heartGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fe31a3"/>
-            <stop offset="60%" stop-color="#fec731"/>
-            <stop offset="100%" stop-color="#fff"/>
-          </linearGradient>
-        </defs>
-        <path 
-          id="heartFill"
-          d="M100 30
-            Q140 0 170 30
-            Q200 60 100 180
-            Q0 60 30 30
-            Q60 0 100 30Z"
-          fill="url(#heartGradient)"
-          style="stroke:none; opacity:0;"/>
-      </svg>
-      <div class="loading-glow" id="loadingGlow">
-        <span class="lds-heart"></span>
-        <span class="loading">Loading with all my love...</span>
-      </div>
-    </div>
-    <div class="ilove-container" id="iloveContainer">
-      <span class="love-text bounce">
-        <span class="sparkle">&#10024;</span> I love you <span class="name gradient-text pop">LILLY</span> <span class="sparkle">&#10024;</span>
-      </span>
-    </div>
-    <div class="present-stage" id="presentStage">
-      <div class="present">
-        <div class="lid"></div>
-        <div class="box"></div>
-        <div class="ribbon"></div>
-        <div class="letters">
-          <span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span>
-          <span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span>
-          <span>L</span><span>I</span><span>L</span><span>L</span><span>Y</span>
-        </div>
-      </div>
-      <div class="happy-birthday" id="happyBirthdayTop"></div>
-      <div class="confetti" id="confetti"></div>
+  <canvas id="stars"></canvas>
+  <div class="portal-container" id="portalContainer">
+    <svg class="portal" viewBox="0 0 200 200">
+      <radialGradient id="portalGrad" cx="50%" cy="50%" r="60%" fx="50%" fy="50%">
+        <stop offset="0%" stop-color="#fff9d7" />
+        <stop offset="60%" stop-color="#ec4ed6" />
+        <stop offset="93%" stop-color="#3c245c" />
+      </radialGradient>
+      <ellipse cx="100" cy="100" rx="74" ry="61" fill="url(#portalGrad)" filter="url(#portalShadow)" opacity="0.93"/>
+    </svg>
+    <button id="enterBtn" class="enter-btn">
+      <span class="wave">Touch to Enter</span>
+    </button>
+  </div>
+  <!-- Heart constellation scene -->
+  <div class="heart-constellation" id="heartConstellation">
+    <canvas id="heartStars"></canvas>
+    <div class="orbiting-text" id="orbitingText"></div>
+    <div class="stellar-load" id="stellarLoad">
+      <div class="stellar-sand" id="stellarSand"></div>
     </div>
   </div>
+  <!-- Space Present & Birthday Text -->
+  <div class="present-cosmos" id="presentCosmos">
+    <div class="present-comet" id="presentComet">
+      <div class="present-box">
+        <div class="present-top"></div>
+        <div class="present-ribbon"></div>
+      </div>
+      <div class="present-tail"></div>
+    </div>
+    <div class="cosmic-letters" id="cosmicLetters"></div>
+  </div>
+  <!-- Finale: Shooting Stars -->
+  <div class="shooting-stars" id="shootingStars"></div>
+  <div class="final-message" id="finalMessage"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
-function randomRange(min, max) {
-  return Math.random() * (max - min) + min;
+/* Starfield BG */
+const stars = document.getElementById('stars');
+stars.width = window.innerWidth;
+stars.height = window.innerHeight;
+const ctx = stars.getContext('2d');
+function drawStars() {
+  ctx.clearRect(0,0,stars.width,stars.height);
+  for (let i = 0; i < 130; i++) {
+    let x = Math.random() * stars.width;
+    let y = Math.random() * stars.height;
+    let r = Math.random() * 1.6 + 0.7;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.7+0.1})`;
+    ctx.shadowColor = "#fe31a3";
+    ctx.shadowBlur = Math.random()*4;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
 }
+drawStars();
+/* Portal Entrance */
+const portalContainer = document.getElementById('portalContainer');
+const enterBtn = document.getElementById('enterBtn');
+const heartConstellation = document.getElementById('heartConstellation');
+const orbitingText = document.getElementById('orbitingText');
+const stellarLoad = document.getElementById('stellarLoad');
+const stellarSand = document.getElementById('stellarSand');
+const presentCosmos = document.getElementById('presentCosmos');
+const cosmicLetters = document.getElementById('cosmicLetters');
+const shootingStars = document.getElementById('shootingStars');
+const finalMessage = document.getElementById('finalMessage');
 
-// Starfield Animation
-const starfield = document.querySelector('.starfield');
-for(let i=0; i<100; i++){
-  const star = document.createElement('div');
-  star.className = 'star';
-  star.style.top = `${randomRange(2,98)}vh`;
-  star.style.left = `${randomRange(1,98)}vw`;
-  star.style.opacity = randomRange(0.3,1);
-  star.style.width = star.style.height = `${randomRange(1,2.4)}px`;
-  starfield.appendChild(star);
-}
-
-// Epic Button Shine
+// Animate Button Wave
 setInterval(()=>{
-  document.getElementById('birthdayBtn').classList.toggle('shine');
-}, 1900);
+  document.querySelector('.wave').classList.toggle('wave-fx');
+},1000);
 
-// Heart Particle Animation
-function spawnParticles(){
-  const pcontainer = document.querySelector('.particles');
-  pcontainer.innerHTML = '';
-  for(let i=0;i<26;i++){
-    let p = document.createElement('div');
-    p.className = 'heart-particle';
-    p.style.top = '54%';
-    p.style.left = '50%';
-    pcontainer.appendChild(p);    
+// Entrance Sequence
+enterBtn.onclick = function(){
+  enterBtn.classList.add('hide');
+  gsap.to('.portal', {scale: 1.25, opacity: 1, duration:1.7, ease: "power2.inOut"});
+  gsap.to('.portal', {filter:'blur(8px)', duration: 1.3, delay:.5});
+  setTimeout(()=>{
+    portalContainer.style.opacity = 0;
+    heartConstellation.style.display = 'block';
+    gsap.fromTo(heartConstellation,{opacity:0},{opacity:1,duration:1.2});
+    setTimeout(triggerHeartScene, 900);
+  },1300);
+}
+
+// Heart Constellation Animation
+function triggerHeartScene() {
+  // Draw heart-shaped constellation
+  const ca = document.getElementById('heartStars');
+  ca.width = 440;
+  ca.height = 350;
+  const cx = ca.getContext('2d');
+  cx.clearRect(0,0,ca.width,ca.height);
+  let points = [];
+  for(let t=0;t<Math.PI*2;t+=.24){
+    // parametric heart curve
+    let x = 220 + 95*16*Math.pow(Math.sin(t),3)/17;
+    let y = 180 - 92*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/17;
+    points.push({x,y});
+  }
+  for(let i=0;i<points.length;i++){
+    // draw each star
+    cx.beginPath();
+    cx.arc(points[i].x,points[i].y,4,0,Math.PI*2);
+    cx.fillStyle = "#fff";
+    cx.shadowColor = "#fe31a3";
+    cx.shadowBlur = 12;
+    cx.fill();
+    // draw lines
+    if(i>0){
+      cx.beginPath();
+      cx.moveTo(points[i-1].x,points[i-1].y);
+      cx.lineTo(points[i].x,points[i].y);
+      cx.strokeStyle = "rgba(254,49,163,0.13)";
+      cx.lineWidth = 2;
+      cx.stroke();
+    }
+    cx.shadowBlur = 0;
+  }
+  // Draw little orbiting hearts as 'planets'
+  for(let k=0;k<8;k++){
+    let ang = (Math.PI/4)*k;
+    let rx = 220 + Math.cos(ang)*60;
+    let ry = 180 + Math.sin(ang)*54;
+    cx.beginPath();
+    cx.arc(rx,ry,8,0,Math.PI*2);
+    cx.fillStyle = "#fe31a3";
+    cx.shadowColor = "#ffe14c";
+    cx.shadowBlur = 8;
+    cx.fill();
+    cx.shadowBlur = 0;
+  }
+  // Animate "love travels galaxies" orbiting text
+  orbitingText.innerHTML = "";
+  let phrase = "Lilly, love travels galaxies for you";
+  for(let c=0; c<phrase.length; c++){
+    let span = document.createElement("span");
+    span.textContent = phrase[c];
+    span.style.display='inline-block';
+    span.style.position='relative';
+    orbitingText.appendChild(span);
+    gsap.fromTo(span,{y:-90,opacity:0,scale:0.8,color:"#fec731"},
+      {y:0,opacity:1,scale:1.12,color:"#fff",
+       delay:0.2+c*0.06,
+       duration:0.7,ease:"elastic.out(1,0.8)"});
+    gsap.to(span,{
+      y: Math.sin(c/phrase.length*Math.PI*2)*14,
+      x: Math.cos(c/phrase.length*Math.PI*2)*7,
+      duration:2.2,repeat:-1,yoyo:true,delay:1.2+c*0.03,
+      ease:"power1.inOut"
+    });
+  }
+  setTimeout(()=> startStellarLoad(),3200);
+}
+
+// Stellar-sand loading in heart!
+function startStellarLoad(){
+  stellarLoad.style.display = 'block';
+  stellarSand.innerHTML = '';
+  // Fill heart with sand pixels
+  let fill = 0, sandCount = 0,max=88;
+  let sandTimer = setInterval(()=>{
+    fill += 1.1;
+    sandCount++;
+    let s = document.createElement('div');
+    s.className = 'sand-pixel';
+    s.style.top = (96+Math.random()*80)+"px";
+    s.style.left = (157+(Math.random()-0.5)*82)+"px";
+    s.style.background = sandCount%2==1?'#fec731':'#fe31a3';
+    stellarSand.appendChild(s);
+    if(sandCount>=max){
+      clearInterval(sandTimer);
+      gsap.to(stellarLoad, {scale:1.14, duration:0.5});
+      setTimeout(()=>showPresentComet(), 800);
+    }
+  },22);
+}
+
+// Present Comet sequence
+function showPresentComet(){
+  heartConstellation.style.opacity=0;
+  presentCosmos.style.display='block';
+  gsap.fromTo('#presentComet',{x:-330,y:110,opacity:0.6,scale:0.7,rotate:-16},{
+    x:window.innerWidth/2-92,y:210,opacity:1,scale:1.2,rotate:0,
+    duration:1.6,ease:'back.out(1.5)',
+    onComplete:()=>unboxComet()
+  });
+}
+
+function unboxComet(){
+  // Drop box, open with magic burst
+  gsap.to('.present-top',{y:-38,rotate:-13,duration:1.2,delay:.7,ease:'power2.out'});
+  gsap.to('.present-tail',{
+    scaleY:1.25,opacity:0.3,duration:2,delay:0.35,ease:"sine.inOut"
+  });
+  setTimeout(()=>revealCosmicLetters(), 1200);
+}
+
+// Cosmic Letters spell HAPPY BIRTHDAY LILLY
+function revealCosmicLetters(){
+  const msg = "HAPPY BIRTHDAY LILLY";
+  cosmicLetters.innerHTML = "";
+  for(let i=0;i<msg.length;i++){
+    let ltr = document.createElement('span');
+    ltr.textContent = msg[i]==' '?'\u00A0':msg[i];
+    ltr.className = "cosmic-ltr";
+    cosmicLetters.appendChild(ltr);
+    gsap.fromTo(ltr,{y:70,opacity:0,scale:0.5},{y:-102-(Math.random()*20),x:-90+(i*26)+(Math.random()*12),opacity:1,scale:1.2+Math.random()*0.17,duration:1,ease:"back.out(1.6)",delay:.2+.07*i});
+    gsap.to(ltr,{
+      color:'#fec731',textShadow:"0 3px 19px #fe31a3",scale:1.18,repeat:2,yoyo:true,duration:1.5,delay:1.15+.11*i
+    });
+  }
+  // Shooting Stars Finale
+  setTimeout(startShootingStars, 2200);
+}
+
+// Shooting Star Finale and Message
+function startShootingStars(){
+  // Launch up to 18 shooting heart stars at random angles
+  shootingStars.innerHTML = "";
+  for(let i=0;i<18;i++){
+    let div = document.createElement('div');
+    div.className = 'shooting-star';
+    let angle = Math.random()*360;
+    div.style.top      = ((window.innerHeight/2)+(Math.sin(angle)*60))+'px';
+    div.style.left     = ((window.innerWidth/2)+(Math.cos(angle)*60))+'px';
+    div.style.transform= `rotate(${angle}deg)`;
+    shootingStars.appendChild(div);
     setTimeout(()=>{
-      p.style.transform = `translate(-50%,-50%) scale(${randomRange(0.5,1.2)}) rotate(${randomRange(0,360)}deg)`;
-      p.style.opacity = 0;
-      p.style.top = `${randomRange(43,68)}%`;
-      p.style.left = `${randomRange(38,62)}%`;
-    },300+randomRange(0,600));
+      div.classList.add('shoot');
+    },300+Math.random()*700);
   }
+  setTimeout(()=>showFinalMessage(), 1300);
 }
 
-// Confetti Animation
-function spawnConfetti(){
-  const container = document.getElementById('confetti');
-  container.innerHTML = '';
-  for(let i=0;i<40;i++){
-    let c = document.createElement('div');
-    c.className = 'confetti-piece';
-    c.style.left = `${randomRange(5,95)}vw`;
-    c.style.animationDelay = `${randomRange(0,1.5)}s`;
-    c.style.background = i%2===0? 
-      'linear-gradient(45deg,#fe31a3,#fec731)':
-      'linear-gradient(45deg,#fff 60%,#fe31a3)';
-    container.appendChild(c);
-  }
+function showFinalMessage(){
+  finalMessage.innerHTML = `<span class="galaxy-love">I love you!</span><span class="outworld">You are out of this world!</span>`;
+  gsap.fromTo('.galaxy-love',{scale:0.7,opacity:0,color:'#fe31a3'},{scale:1.25,opacity:1,duration:1.2,ease:"elastic.out(1,.8)",color:'#fff'});
+  gsap.fromTo('.outworld',{scale:0.7,opacity:0,color:'#fec731'},{scale:1.18,opacity:1,duration:1.1,delay:.74,ease:"elastic.out(1,.9)",color:'#ffe14c'});
 }
 
-const btn = document.getElementById('birthdayBtn');
-const heartContainer = document.getElementById('heartContainer');
-const heartFill = document.getElementById('heartFill');
-const loadingGlow = document.getElementById('loadingGlow');
-const iloveContainer = document.getElementById('iloveContainer');
-const presentStage = document.getElementById('presentStage');
-const letters = document.querySelectorAll('.letters span');
-const happyBirthdayTop = document.getElementById('happyBirthdayTop');
-const lid = document.querySelector('.lid');
-
-btn.onclick = () => {
-  btn.classList.add('fadeOut');
-  setTimeout(() => {
-    heartContainer.classList.add('fadeIn');
-    loadingGlow.style.opacity = "1";
-    // Animated loading heart
-    let fillAmt = 0;
-    let interval = setInterval(() => {
-      fillAmt += 0.021;
-      heartFill.style.opacity = fillAmt;
-      if (Math.random()<0.12) spawnParticles(); // Heart sparkle burst
-      if (fillAmt >= 1) {
-        clearInterval(interval);
-        loadingGlow.style.opacity = "0";
-        setTimeout(() => {
-          heartContainer.classList.add('fadeOut');
-          setTimeout(() => {
-            iloveContainer.classList.add('showLove');
-            spawnParticles();
-            setTimeout(() => {
-              iloveContainer.classList.remove('showLove');
-              presentStage.classList.add('showPresent');
-              setTimeout(() => {
-                lid.classList.add('lidOpen');
-                spawnConfetti();
-                setTimeout(() => {
-                  // Super bouncy letters launching
-                  letters.forEach((letter, i) => {
-                    setTimeout(() => {
-                      letter.classList.add('flyUp');
-                      let animatedLtr = document.createElement('span');
-                      animatedLtr.className = 'top-letter';
-                      animatedLtr.textContent = letter.textContent;
-                      happyBirthdayTop.appendChild(animatedLtr);
-                      setTimeout(() => {
-                        animatedLtr.classList.add('popTop');
-                      },80+i*5);
-                    }, i * 80 + 160);
-                  });
-                }, 530);
-              }, 830);
-            }, 2200);
-          }, 880);
-        }, 550);
-      }
-    }, 30);
-  }, 600);
-};
 </script>
 </body>
 </html>
