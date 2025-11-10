@@ -6,9 +6,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="starfield"></div>
   <div class="container">
-    <button class="birthday-btn" id="birthdayBtn">Press Me</button>
+    <button class="birthday-btn shine" id="birthdayBtn">Press Me</button>
     <div class="heart-container" id="heartContainer">
+      <div class="particles"></div>
       <svg class="heart" viewBox="0 0 200 200">
         <path 
           id="heartOutline"
@@ -17,7 +19,14 @@
             Q200 60 100 180
             Q0 60 30 30
             Q60 0 100 30Z"
-          stroke="#fff" stroke-width="5" fill="none"/>
+          stroke="url(#heartGradient)" stroke-width="7" fill="none"/>
+        <defs>
+          <linearGradient id="heartGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fe31a3"/>
+            <stop offset="60%" stop-color="#fec731"/>
+            <stop offset="100%" stop-color="#fff"/>
+          </linearGradient>
+        </defs>
         <path 
           id="heartFill"
           d="M100 30
@@ -25,18 +34,24 @@
             Q200 60 100 180
             Q0 60 30 30
             Q60 0 100 30Z"
-          fill="red"
+          fill="url(#heartGradient)"
           style="stroke:none; opacity:0;"/>
       </svg>
-      <div class="loading" id="loadingText">Loading...</div>
+      <div class="loading-glow" id="loadingGlow">
+        <span class="lds-heart"></span>
+        <span class="loading">Loading with all my love...</span>
+      </div>
     </div>
     <div class="ilove-container" id="iloveContainer">
-      <span class="love-text">I love you <span class="name">LILLY</span></span>
+      <span class="love-text bounce">
+        <span class="sparkle">&#10024;</span> I love you <span class="name gradient-text pop">LILLY</span> <span class="sparkle">&#10024;</span>
+      </span>
     </div>
     <div class="present-stage" id="presentStage">
       <div class="present">
         <div class="lid"></div>
         <div class="box"></div>
+        <div class="ribbon"></div>
         <div class="letters">
           <span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span>
           <span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span>
@@ -44,54 +59,123 @@
         </div>
       </div>
       <div class="happy-birthday" id="happyBirthdayTop"></div>
+      <div class="confetti" id="confetti"></div>
     </div>
   </div>
 <script>
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+// Starfield Animation
+const starfield = document.querySelector('.starfield');
+for(let i=0; i<100; i++){
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.top = `${randomRange(2,98)}vh`;
+  star.style.left = `${randomRange(1,98)}vw`;
+  star.style.opacity = randomRange(0.3,1);
+  star.style.width = star.style.height = `${randomRange(1,2.4)}px`;
+  starfield.appendChild(star);
+}
+
+// Epic Button Shine
+setInterval(()=>{
+  document.getElementById('birthdayBtn').classList.toggle('shine');
+}, 1900);
+
+// Heart Particle Animation
+function spawnParticles(){
+  const pcontainer = document.querySelector('.particles');
+  pcontainer.innerHTML = '';
+  for(let i=0;i<26;i++){
+    let p = document.createElement('div');
+    p.className = 'heart-particle';
+    p.style.top = '54%';
+    p.style.left = '50%';
+    pcontainer.appendChild(p);    
+    setTimeout(()=>{
+      p.style.transform = `translate(-50%,-50%) scale(${randomRange(0.5,1.2)}) rotate(${randomRange(0,360)}deg)`;
+      p.style.opacity = 0;
+      p.style.top = `${randomRange(43,68)}%`;
+      p.style.left = `${randomRange(38,62)}%`;
+    },300+randomRange(0,600));
+  }
+}
+
+// Confetti Animation
+function spawnConfetti(){
+  const container = document.getElementById('confetti');
+  container.innerHTML = '';
+  for(let i=0;i<40;i++){
+    let c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.left = `${randomRange(5,95)}vw`;
+    c.style.animationDelay = `${randomRange(0,1.5)}s`;
+    c.style.background = i%2===0? 
+      'linear-gradient(45deg,#fe31a3,#fec731)':
+      'linear-gradient(45deg,#fff 60%,#fe31a3)';
+    container.appendChild(c);
+  }
+}
+
 const btn = document.getElementById('birthdayBtn');
 const heartContainer = document.getElementById('heartContainer');
 const heartFill = document.getElementById('heartFill');
-const loadingText = document.getElementById('loadingText');
+const loadingGlow = document.getElementById('loadingGlow');
 const iloveContainer = document.getElementById('iloveContainer');
 const presentStage = document.getElementById('presentStage');
 const letters = document.querySelectorAll('.letters span');
 const happyBirthdayTop = document.getElementById('happyBirthdayTop');
+const lid = document.querySelector('.lid');
 
 btn.onclick = () => {
   btn.classList.add('fadeOut');
   setTimeout(() => {
     heartContainer.classList.add('fadeIn');
-    loadingText.style.opacity = "1";
+    loadingGlow.style.opacity = "1";
+    // Animated loading heart
     let fillAmt = 0;
     let interval = setInterval(() => {
-      fillAmt += 0.02;
+      fillAmt += 0.021;
       heartFill.style.opacity = fillAmt;
+      if (Math.random()<0.12) spawnParticles(); // Heart sparkle burst
       if (fillAmt >= 1) {
         clearInterval(interval);
-        loadingText.style.opacity = "0";
+        loadingGlow.style.opacity = "0";
         setTimeout(() => {
           heartContainer.classList.add('fadeOut');
           setTimeout(() => {
             iloveContainer.classList.add('showLove');
+            spawnParticles();
             setTimeout(() => {
               iloveContainer.classList.remove('showLove');
               presentStage.classList.add('showPresent');
               setTimeout(() => {
-                document.querySelector('.lid').classList.add('lidOpen');
+                lid.classList.add('lidOpen');
+                spawnConfetti();
                 setTimeout(() => {
+                  // Super bouncy letters launching
                   letters.forEach((letter, i) => {
                     setTimeout(() => {
                       letter.classList.add('flyUp');
-                      happyBirthdayTop.innerHTML += letter.textContent;
-                    }, i * 120);
+                      let animatedLtr = document.createElement('span');
+                      animatedLtr.className = 'top-letter';
+                      animatedLtr.textContent = letter.textContent;
+                      happyBirthdayTop.appendChild(animatedLtr);
+                      setTimeout(() => {
+                        animatedLtr.classList.add('popTop');
+                      },80+i*5);
+                    }, i * 80 + 160);
                   });
-                }, 800);
-              }, 900);
+                }, 530);
+              }, 830);
             }, 2200);
-          }, 900);
-        }, 1000);
+          }, 880);
+        }, 550);
       }
-    }, 40);
-  }, 700);
+    }, 30);
+  }, 600);
 };
 </script>
 </body>
